@@ -1,8 +1,6 @@
 package com.example.labb3;
 
-import Shapes.RectangleShape;
-import Shapes.Shape;
-import Shapes.Factory;
+import Shapes.*;
 import javafx.application.Platform;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
@@ -12,14 +10,12 @@ import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.*;
 import javafx.scene.input.MouseEvent;
+import javafx.scene.paint.Color;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import model.shapeModel;
 
 import java.io.File;
-
-import static Shapes.Factory.circleOf;
-import static Shapes.Factory.rectangleOf;
 
 
 public class HelloController {
@@ -27,8 +23,7 @@ public class HelloController {
     public BooleanProperty circle;
     public GraphicsContext context;
     public TextField brushSize;
-    public CheckBox eraser;
-    public ColorPicker cp;
+    public ColorPicker colorPick;
     public BooleanProperty rectangle;
     public MenuItem save;
     public shapeModel model;
@@ -55,27 +50,32 @@ public class HelloController {
 
     public void initialize () {
         context = canvas.getGraphicsContext2D();
-        rectangle.bindBidirectional(model.rectangleProperty());
-        cp.valueProperty().bindBidirectional(model.colorSelectProperty());
+        colorPick.valueProperty().bindBidirectional(model.colorSelectProperty());
         circle.bindBidirectional(model.circleSelectProperty());
+        rectangle.bindBidirectional(model.rectangleProperty());
         brushSize.textProperty().bindBidirectional(model.sizeSelectProperty());
-        model.getShapeObservableList().addListener((ListChangeListener<Shape>) e -> drawShapeCanvas());
+        model.getShapeObservableList().addListener((ListChangeListener<Shape>) e -> printAllShapes());
 
 
 
     }
     public void drawShape(MouseEvent mouseEvent) {
-
+        Shape newShape = returnNewShape(model.getShapeType(), colorPick.getValue(), mouseEvent.getX(),mouseEvent.getY(), model.getSizeText());
+        model.addToShapes(newShape);
+        printAllShapes();
 
             }
+            public void printAllShapes(){
+            for (var Shape : model.getShapeObservableList())
+                Shape.draw(context);
+            }
 
-    private Shape returnNewShape(ColorPicker colorPicker, double x, double y, TextField size) {
-        if (circle.get())
-            return circleOf(cp.getValue(), x,y, model.getSizeText());
-        if (rectangle.get())
-            return rectangleOf(cp.getValue(), x, y, model.getSizeText());
-        return null;
+    private Shape returnNewShape(ShapeType type, Color colorPick, double x, double y, double size) {
+      return Factory.createShape(type,colorPick,x,y,size);
     }
+
+
+
 
 
 
@@ -84,59 +84,16 @@ public class HelloController {
             Platform.exit();
     }
 
-    public void eraser(ActionEvent event) {
-        canvas.setOnMousePressed(e -> {
-            double size = Double.parseDouble(brushSize.getText());
-            double x = e.getX() - size;
-            double y = e.getY() - size / 2;
-            if (eraser.isSelected()) {
-                context.clearRect(x, y, size, size);
-            } else {
-                System.out.println(" ");
-            }
-        });
-    }
 
 
         public void actionRectangle (){
-        model.setRectangle();
-
-
-
-            /*canvas.setOnMousePressed(e -> {
-                double size = Double.parseDouble(brushSize.getText());
-                double x = e.getX() - size;
-                double y = e.getY() - size / 2;
-                if(eraser.isSelected()){
-                    context.clearRect(x,y,size,size);
-                } else {
-                    context.setFill(cp.getValue());
-                    context.fillRect(x,y,2*size,size);
-                }
-
-            });*/
+        model.setRectangle(ShapeType.RECTANGLESHAPE);
         }
        public void onCircleClick (){
-        model.setCircleSelect();
-
-            /*canvas.setOnMousePressed(e -> {
-                double size = Double.parseDouble(brushSize.getText());
-                double x = e.getX() - size / 2;
-                double y = e.getY() - size / 2;
-                if(eraser.isSelected()){
-                    context.clearRect(x,y,size,size);
-                } else {
-                    context.setFill(cp.getValue());
-                    context.fillOval(x,y,size,size);
-                }
-
-            });*/
+        model.setCircleSelect(ShapeType.CIRCLESHAPE);
 
       }
-        public void handleColorPicker (ActionEvent event){
 
-
-        }
 
 
     public void onSave(ActionEvent event) {
@@ -151,43 +108,13 @@ public class HelloController {
 
     }
 
-    public void actionPaint(ActionEvent event) {
-        context = canvas.getGraphicsContext2D();
-        canvas.setOnMouseDragged(e -> {
-            double size = Double.parseDouble(brushSize.getText());
-            double x = e.getX() - size / 2;
-            double y = e.getY() - size / 2;
-            if(eraser.isSelected()){
-                context.clearRect(x,y,size,size);
-            } else {
-                context.setFill(cp.getValue());
-                context.fillRect(x,y,size,size);
-            }
-        });
-    }
-
-    public void actionEraser(ActionEvent event) {
-        context = canvas.getGraphicsContext2D();
-        canvas.setOnMouseDragged(e -> {
-            double size = Double.parseDouble(brushSize.getText());
-            double x = e.getX() - size / 2;
-            double y = e.getY() - size / 2;
-            if(eraser.isSelected()){
-                context.clearRect(x,y,size,size);
-        }
-    });
-    }
 
     public RectangleShape canvasClicked(MouseEvent mouseEvent) {
         if(rectangle.get()){
-            return new RectangleShape(cp.getValue(),mouseEvent.getX() ,mouseEvent.getY(), model.getSizeText());
+            return new RectangleShape(colorPick.getValue(),mouseEvent.getX() ,mouseEvent.getY(), model.getSizeText());
         }
 
         return null;
     }
 
-    private void drawShapeCanvas(){
-        for(var shape : model.getShapeObservableList())
-            shape.draw(context);
-    }
 }

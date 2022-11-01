@@ -1,7 +1,7 @@
 package model;
 
-import Shapes.RectangleShape;
 import Shapes.Shape;
+import Shapes.ShapeType;
 import javafx.beans.Observable;
 import javafx.beans.property.*;
 import javafx.collections.FXCollections;
@@ -13,19 +13,20 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 
 public class shapeModel {
-
-    BooleanProperty circleModel = new SimpleBooleanProperty();
-    BooleanProperty rectangleModel = new SimpleBooleanProperty();
-    ObjectProperty<Shape> shapeList = new SimpleObjectProperty<>();
-    ObjectProperty<Color> colorObjectProperty = new SimpleObjectProperty<>();
-    StringProperty sizeing = new SimpleStringProperty();
-
     private final BooleanProperty circleSelect;
     private final BooleanProperty rectangle;
     private final ObservableList<Shape> shapeObservableList;
     private final ObjectProperty<Color> colorPickerSelect;
     private final StringProperty sizeSelect;
+    private ShapeType shapeType;
 
+    public ShapeType getShapeType() {
+        return shapeType;
+    }
+
+    public void setShapeType(ShapeType shapeType) {
+        this.shapeType = shapeType;
+    }
 
     public shapeModel() {
         this.colorPickerSelect = new SimpleObjectProperty<>(Color.BLUE);
@@ -40,21 +41,29 @@ public class shapeModel {
         this.sizeSelect = new SimpleStringProperty("100");
 
     }
+
     public void addToShapes(Shape shape){
         if(!(shape == null))
             this.shapeObservableList.add(shape);
 
     }
 
-    public void setCircleSelect(){
-        circleSelect.set(true);
-        rectangle.set(false);
+    public void setCircleSelect(ShapeType type){
+        shapeType = ShapeType.CIRCLESHAPE;
     }
 
-    public void setRectangle(){
-        circleSelect.set(false);
-        rectangle.set(true);
+    public void setRectangle(ShapeType type){
+        shapeType = ShapeType.RECTANGLESHAPE;
+
+
     }
+    public void setSelecitonShape(ShapeType type){
+        switch (type) {
+            case CIRCLESHAPE -> shapeType = ShapeType.CIRCLESHAPE;
+            case RECTANGLESHAPE -> shapeType = ShapeType.RECTANGLESHAPE;
+
+            }
+        }
 
 
     public boolean isCircleSelect() {
@@ -143,65 +152,6 @@ public class shapeModel {
         }
     }
 
-    public boolean isCircleModel() {
-        return circleModel.get();
-    }
-
-    public BooleanProperty circleModelProperty() {
-        return circleModel;
-    }
-
-    public void setCircleModel(boolean circleModel) {
-        this.circleModel.set(circleModel);
-    }
-
-    public boolean isRectangleModel() {
-        return rectangleModel.get();
-    }
-
-    public BooleanProperty rectangleModelProperty() {
-        return rectangleModel;
-    }
-
-    public void setRectangleModel(boolean rectangleModel) {
-        this.rectangleModel.set(rectangleModel);
-    }
-
-    public Shape getShapeList() {
-        return shapeList.get();
-    }
-
-    public ObjectProperty<Shape> shapeListProperty() {
-        return shapeList;
-    }
-
-    public void setShapeList(Shape shapeList) {
-        this.shapeList.set(shapeList);
-    }
-
-    public Color getColorObjectProperty() {
-        return colorObjectProperty.get();
-    }
-
-    public ObjectProperty<Color> colorObjectPropertyProperty() {
-        return colorObjectProperty;
-    }
-
-    public void setColorObjectProperty(Color colorObjectProperty) {
-        this.colorObjectProperty.set(colorObjectProperty);
-    }
-
-    public String getSizeing() {
-        return sizeing.get();
-    }
-
-    public StringProperty sizeingProperty() {
-        return sizeing;
-    }
-
-    public void setSizeing(String sizeing) {
-        this.sizeing.set(sizeing);
-    }
 
 
 }
