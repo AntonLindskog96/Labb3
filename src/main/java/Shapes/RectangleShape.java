@@ -6,8 +6,8 @@ import javafx.scene.paint.Color;
 
 public class RectangleShape extends Shape{
 
-    public RectangleShape(Color color, double x, double y, double size){
-        super(color, x,y,size);
+    public RectangleShape(Color color, double x, double y, double size,ShapeType type){
+        super(color, x,y,size,type);
 
     }
 
@@ -18,6 +18,11 @@ public class RectangleShape extends Shape{
         double y = getY() - size / 2;
         context.setFill(getColor());
         context.fillRect(x,y, size * 1.75, size);
+    }
+
+    @Override
+    public Shape copyOf (){
+        return new RectangleShape(getColor(), getX(),getY(),getSize(),getShape());
     }
 
     @Override

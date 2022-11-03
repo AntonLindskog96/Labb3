@@ -13,14 +13,20 @@ public abstract class Shape {
     private final SimpleDoubleProperty x = new SimpleDoubleProperty();
     private final SimpleDoubleProperty size = new SimpleDoubleProperty();
     private final SimpleObjectProperty<Color> color = new SimpleObjectProperty();
+    private final ShapeType shape;
+
+    public ShapeType getShape(){
+        return shape;
+    }
 
 
 
-    public Shape(Color color, double x, double y, double size) {
+    public Shape(Color color, double x, double y, double size, ShapeType shape) {
         setX(x);
         setY(y);
         setColor(color);
         setSize(size);
+        this.shape = shape;
     }
 
     public double getY() {
@@ -73,8 +79,10 @@ public abstract class Shape {
 
     public void draw(GraphicsContext context){
 
+
     }
 
+    public abstract Shape copyOf();
 }
 
 

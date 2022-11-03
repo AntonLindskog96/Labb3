@@ -5,8 +5,8 @@ import javafx.scene.paint.Color;
 
 public class CircleShape extends Shape{
 
-    public CircleShape(Color color, double x, double y, double size) {
-        super(color,x,y,size );
+    public CircleShape(Color color, double x, double y, double size,ShapeType type) {
+        super(color,x,y,size,type );
 
     }
 
@@ -18,6 +18,12 @@ public class CircleShape extends Shape{
         context.setFill(getColor());
         context.fillOval(x,y , size, size);
     }
+
+    @Override
+    public Shape copyOf (){
+        return new CircleShape(getColor(), getX(),getY(), getSize(),getShape());
+    }
+
 
     @Override
     public String toString() {

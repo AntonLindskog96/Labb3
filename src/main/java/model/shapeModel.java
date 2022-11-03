@@ -11,13 +11,17 @@ import javafx.scene.paint.Color;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.List;
 
 public class shapeModel {
-    private final BooleanProperty circleSelect;
-    private final BooleanProperty rectangle;
+    private final BooleanProperty Circle;
+    private final BooleanProperty Rectangle;
     private final ObservableList<Shape> shapeObservableList;
     private final ObjectProperty<Color> colorPickerSelect;
     private final StringProperty sizeSelect;
+    private final List<List<Shape>> undoList = new ArrayList<>();
+    private final BooleanProperty selectOption;
     private ShapeType shapeType;
 
     public ShapeType getShapeType() {
@@ -29,34 +33,47 @@ public class shapeModel {
     }
 
     public shapeModel() {
-        this.colorPickerSelect = new SimpleObjectProperty<>(Color.BLUE);
-        this.circleSelect = new SimpleBooleanProperty(false);
-        this.rectangle = new SimpleBooleanProperty(false);
+        this.colorPickerSelect = new SimpleObjectProperty<>(Color.BLACK);
+        this.Circle = new SimpleBooleanProperty(false);
+        this.selectOption = new SimpleBooleanProperty(false);
+        this.Rectangle = new SimpleBooleanProperty(false);
         this.shapeObservableList = FXCollections.observableArrayList(shape -> new Observable[]{
                 shape.colorProperty(),
                 shape.xProperty(),
                 shape.yProperty(),
                 shape.sizeProperty()
         });
-        this.sizeSelect = new SimpleStringProperty("100");
+        this.sizeSelect = new SimpleStringProperty("75");
 
     }
 
+    public void undoItem (){
+        if(undoList.size() > 0){
+            undoList.remove(undoList.size() - 1);
+        }
+    }
+
     public void addToShapes(Shape shape){
+
         if(!(shape == null))
             this.shapeObservableList.add(shape);
 
     }
 
-    public void setCircleSelect(ShapeType type){
+    public void setCircle(ShapeType type){
         shapeType = ShapeType.CIRCLESHAPE;
+        setSelectOption(false);
     }
 
     public void setRectangle(ShapeType type){
         shapeType = ShapeType.RECTANGLESHAPE;
+        setSelectOption(false);
 
 
     }
+
+
+
     public void setSelecitonShape(ShapeType type){
         switch (type) {
             case CIRCLESHAPE -> shapeType = ShapeType.CIRCLESHAPE;
@@ -66,20 +83,20 @@ public class shapeModel {
         }
 
 
-    public boolean isCircleSelect() {
-        return circleSelect.get();
+    public boolean isCircle() {
+        return Circle.get();
     }
 
     public BooleanProperty circleSelectProperty() {
-        return circleSelect;
+        return Circle;
     }
 
-    public boolean isRectangle() {
-        return rectangle.get();
+    public boolean getRectangle() {
+        return Rectangle.get();
     }
 
     public BooleanProperty rectangleProperty() {
-        return rectangle;
+        return Rectangle;
     }
 
 
@@ -97,12 +114,12 @@ public class shapeModel {
         return shapeObservableList;
     }
 
-    public void setCircleSelect(boolean circleSelect) {
-        this.circleSelect.set(circleSelect);
+    public void setCircle(boolean circle) {
+        this.Circle.set(circle);
     }
 
     public void setRectangle(boolean rectangle) {
-        this.rectangle.set(rectangle);
+        this.Rectangle.set(rectangle);
     }
 
     public Color getColorPickerSelect() {
@@ -132,8 +149,20 @@ public class shapeModel {
         return Double.parseDouble(sizeSelect.getValue());
     }
 
-    public void printRectangle(){
+    public boolean isSelectOption() {
+        return selectOption.get();
+    }
 
+    public BooleanProperty selectOptionProperty() {
+        return selectOption;
+    }
+
+    public void setSelectOption (){
+        this.selectOption.set(true);
+    }
+
+    public void setSelectOption(boolean selectOption) {
+        this.selectOption.set(selectOption);
     }
 
     public void saveToFIle(Path file ) {
@@ -150,7 +179,9 @@ public class shapeModel {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
-    }
+        }
+
+
 
 
 
