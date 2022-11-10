@@ -28,6 +28,9 @@ public class HelloApplication extends Application {
         stage.setScene(scene);
         stage.setTitle("JavaPaint Program");
         stage.show();
+
+        HelloController controller = fxmlLoader.getController();
+        controller.setStage(stage);
         }
 
 

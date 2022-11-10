@@ -2,12 +2,11 @@ package com.example.labb3;
 
 import Shapes.*;
 import javafx.application.Platform;
+import javafx.beans.binding.Bindings;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.collections.ListChangeListener;
-import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
-import javafx.geometry.Point2D;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.*;
@@ -15,6 +14,7 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.paint.Color;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
+import model.Point;
 import model.shapeModel;
 
 import java.io.File;
@@ -29,9 +29,12 @@ public class HelloController {
     public ColorPicker colorPick;
     public BooleanProperty rectangle;
     public MenuItem save;
+    public Button rectangleId;
+    public Button circleId;
     public shapeModel model;
     public Factory factory;
     public Button pointer;
+    public CheckBox selector;
     public Button undoButton;
     private Stage stage;
 
@@ -54,37 +57,44 @@ public class HelloController {
 
         context = canvas.getGraphicsContext2D();
         colorPick.valueProperty().bindBidirectional(model.colorSelectProperty());
-        selectOption.bindBidirectional(model.circleSelectProperty());
-        selectOption.bindBidirectional(model.rectangleProperty());
+        selectOption.bindBidirectional(model.selectOptionProperty());
         brushSize.textProperty().bindBidirectional(model.sizeSelectProperty());
-        model.getShapeObservableList().addListener((ListChangeListener<Shape>) e -> printAllShapes());
-
-
+        model.getShapeObservableList().addListener((ListChangeListener<Shape>) e -> drawShapes(context));
+         model.addChangesToUndoList();
+         selector.selectedProperty().bindBidirectional(model.selectOptionProperty());
 
     }
 
-    public void printAllShapes() {
-        for (var Shape : model.getShapeObservableList())
-            Shape.draw(context);
-        System.out.println(model.getShapeObservableList());
-    }
 
     public void onCanvasClicked (MouseEvent mouseEvent) {
         double x = mouseEvent.getX();
         double y = mouseEvent.getY();
-        System.out.println(x + "," + y);
-        if (selectOption.getValue()) {
+
+        if (model.isSelectOption()) {
+            model.checkIfInsideShape(x, y);
+        } else {
+            selectOrCreateShape(x, y);
         }
-        else {
-        Shape newShape = returnNewShape(model.getShapeType(), colorPick.getValue(), mouseEvent.getX(),
-                mouseEvent.getY(), model.getSizeText());
-        model.addToShapes(newShape);
-         }
+    }
+   /*     model.setPoint(mouseEvent.getX(), mouseEvent.getY());
+        if(model.isSelectOption()){
+            model.checkIfInsideShape(mouseEvent.getX(), mouseEvent.getY());
 
-        printAllShapes();
+        }
+        selectOrCreateShape(mouseEvent.getX(), mouseEvent.getY());
+    }*/
 
+    public void clearCanvas (){
+        context.clearRect(0,0,canvas.getWidth(), canvas.getHeight());
 
     }
+    private void drawShapes(GraphicsContext context) {
+       clearCanvas();
+        for (var shape : model.getShapeObservableList()) {
+            shape.draw(context);
+        }
+    }
+
 
     private Shape returnNewShape(ShapeType type, Color colorPick, double x, double y, double size) {
         return Factory.createShape(type, colorPick, x, y, size);
@@ -97,27 +107,47 @@ public class HelloController {
 
 
     public void actionRectangle() {
-        model.setSelecitonShape(ShapeType.RECTANGLESHAPE);
-        model.setSelectOption(false);
+     model.setRectangle();
 
     }
 
     public void onCircleClick() {
-        model.setSelecitonShape(ShapeType.CIRCLESHAPE);
-        model.setSelectOption(false);
+        model.setCircle();
 
     }
     public void onPointSelection (){
         model.setSelectOption(true);
-        model.setCircle(false);
-        model.setRectangle(false);
-
 
         }
-    public void undoAction (){
 
+   /* private void checkIfInsideShape(double x, double y) {
+        for(var shape : model.getShapeObservableList())
+            checkIfSelectedIsInside(x,y, shape);
+
+
+
+    }*/
+
+    private void selectOrCreateShape(double x, double y) {
+        if(selectOption.get())
+            model.checkIfInsideShape(x,y);
+        else
+            createAndAddNewShape(x,y);
+
+        }
+
+        private void createAndAddNewShape(double x, double y) {
+        var newShape = returnNewShape(model.getShapeType(),colorPick.getValue(),x,y,model.getSizeText());
+        model.addToShapes(newShape);
+        model.addChangesToUndoList();
     }
 
+
+    public void undoAction () {
+        model.undoLatestChange();
+
+
+    }
 
 
     public void onSave(ActionEvent event) {
@@ -132,13 +162,15 @@ public class HelloController {
 
     }
 
+    public void onChangeSize() {
+        model.changeSizeOnSelectedShape();
+    }
 
-    public RectangleShape canvasClicked(MouseEvent mouseEvent) {
-        if (rectangle.get()) {
-            return new RectangleShape(colorPick.getValue(), mouseEvent.getX(), mouseEvent.getY(),
-                    model.getSizeText(), ShapeType.RECTANGLESHAPE);
-        }
+    public void onSelectorAction() {
+        model.clearSelectedShapes();
+    }
 
-        return null;
+    public void OnChangeColor() {
+        model.changeColorOnShape();
     }
 }

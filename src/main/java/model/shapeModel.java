@@ -1,5 +1,5 @@
 package model;
-
+import Shapes.Factory;
 import Shapes.Shape;
 import Shapes.ShapeType;
 import javafx.beans.Observable;
@@ -17,25 +17,53 @@ import java.util.List;
 public class shapeModel {
     private final BooleanProperty Circle;
     private final BooleanProperty Rectangle;
+    private Point point;
+
     private final ObservableList<Shape> shapeObservableList;
+    private ObservableList<Shape> selectedShapes;
+    public final List<List<Shape>> undoLists = new ArrayList<>();
+
+
     private final ObjectProperty<Color> colorPickerSelect;
+    private final ObjectProperty<Color> borderColor;
     private final StringProperty sizeSelect;
-    private final List<List<Shape>> undoList = new ArrayList<>();
+    private final List<Integer> changeList;
+
     private final BooleanProperty selectOption;
-    private ShapeType shapeType;
+    private ShapeType shapeType = ShapeType.CIRCLE;
 
     public ShapeType getShapeType() {
         return shapeType;
+
     }
 
-    public void setShapeType(ShapeType shapeType) {
-        this.shapeType = shapeType;
+
+    public void setPoint(double mousePointX, double mousePointY) {
+        this.point = new Point(mousePointX, mousePointY);
     }
+
+    public void changeSizeOnSelectedShape (){
+        addChangesToUndoList();
+        for(var shape : selectedShapes) {
+            shape.setSize(getSizeText());
+        }
+    }
+
+
+    public void createShapeToList(ShapeType type) {
+        Shape shape = Factory.createShape(type,colorPickerSelect.get(),point.getPosX(),point.getPosY(),getSizeText());
+        shapeObservableList.add(shape);
+    }
+
 
     public shapeModel() {
         this.colorPickerSelect = new SimpleObjectProperty<>(Color.BLACK);
+        this.borderColor = new SimpleObjectProperty<>();
+        this.borderColor.set(Color.TEAL);
         this.Circle = new SimpleBooleanProperty(false);
-        this.selectOption = new SimpleBooleanProperty(false);
+        this.selectedShapes = FXCollections.observableArrayList();
+        this.changeList = new ArrayList<>();
+        this.selectOption = new SimpleBooleanProperty();
         this.Rectangle = new SimpleBooleanProperty(false);
         this.shapeObservableList = FXCollections.observableArrayList(shape -> new Observable[]{
                 shape.colorProperty(),
@@ -47,51 +75,63 @@ public class shapeModel {
 
     }
 
-    public void undoItem (){
-        if(undoList.size() > 0){
-            undoList.remove(undoList.size() - 1);
+  public void undoLatestChange(){
+        if(undoLists.isEmpty())
+            return;
+        undoListChange();
+    }
+
+
+
+    public void undoListChange (){
+        shapeObservableList.clear();
+        for (var shape : undoLists.get(undoLists.size() - 1))
+            shapeObservableList.add(shape.copyOf());
+        if(undoLists.size() > 1){
+            undoLists.remove(undoLists.size() - 1);
         }
     }
 
-    public void addToShapes(Shape shape){
+    public void addChangesToUndoList() {
+        List<Shape> tempList = new ArrayList<>();
+        undoLists.add(tempList);
+        copyToTempList(tempList);
 
+    }
+
+    private void copyToTempList(List<Shape> tempList) {
+        shapeObservableList.forEach(shape -> tempList.add(shape.copyOf()));
+
+
+    }
+
+
+    public void addToShapes(Shape shape){
         if(!(shape == null))
             this.shapeObservableList.add(shape);
 
+
     }
 
-    public void setCircle(ShapeType type){
-        shapeType = ShapeType.CIRCLESHAPE;
+    public void setCircle(){
+        shapeType = ShapeType.CIRCLE;
         setSelectOption(false);
     }
 
-    public void setRectangle(ShapeType type){
-        shapeType = ShapeType.RECTANGLESHAPE;
+    public void setRectangle(){
+        shapeType = ShapeType.RECTANGLE;
         setSelectOption(false);
-
-
     }
-
-
-
-    public void setSelecitonShape(ShapeType type){
-        switch (type) {
-            case CIRCLESHAPE -> shapeType = ShapeType.CIRCLESHAPE;
-            case RECTANGLESHAPE -> shapeType = ShapeType.RECTANGLESHAPE;
-
-            }
-        }
-
 
     public boolean isCircle() {
         return Circle.get();
     }
 
-    public BooleanProperty circleSelectProperty() {
+    public BooleanProperty circleProperty() {
         return Circle;
     }
 
-    public boolean getRectangle() {
+    public boolean isRectangle() {
         return Rectangle.get();
     }
 
@@ -99,10 +139,28 @@ public class shapeModel {
         return Rectangle;
     }
 
+    public ObservableList<Shape> getSelectedShape() {
+        return selectedShapes;
+    }
 
 
-    public Color getColorSelect() {
-        return colorPickerSelect.get();
+    public void clearSelectedShapes(){
+        for(var shape : shapeObservableList){
+            shape.setBorderColor(Color.YELLOW);
+        }
+        selectedShapes.clear();
+    }
+
+    public Color getBorderColor() {
+        return borderColor.get();
+    }
+
+    public ObjectProperty<Color> borderColorProperty() {
+        return borderColor;
+    }
+
+    public void setBorderColor(Color borderColor) {
+        this.borderColor.set(borderColor);
     }
 
     public ObjectProperty<Color> colorSelectProperty() {
@@ -122,6 +180,28 @@ public class shapeModel {
         this.Rectangle.set(rectangle);
     }
 
+
+
+    public StringProperty sizeSelectProperty() {
+        return sizeSelect;
+    }
+    public double getSizeText(){
+        return Double.parseDouble(sizeSelect.getValue());
+    }
+
+
+    public BooleanProperty selectOptionProperty() {
+        return selectOption;
+    }
+    public boolean isSelectOption() {
+        return selectOption.get();
+    }
+
+
+    public void setSelectOption(boolean selectOption) {
+        this.selectOption.set(selectOption);
+    }
+
     public Color getColorPickerSelect() {
         return colorPickerSelect.get();
     }
@@ -132,37 +212,6 @@ public class shapeModel {
 
     public void setColorPickerSelect(Color colorPickerSelect) {
         this.colorPickerSelect.set(colorPickerSelect);
-    }
-
-    public String getSizeSelect() {
-        return sizeSelect.get();
-    }
-
-    public StringProperty sizeSelectProperty() {
-        return sizeSelect;
-    }
-
-    public void setSizeSelect(String sizeSelect) {
-        this.sizeSelect.set(sizeSelect);
-    }
-    public double getSizeText(){
-        return Double.parseDouble(sizeSelect.getValue());
-    }
-
-    public boolean isSelectOption() {
-        return selectOption.get();
-    }
-
-    public BooleanProperty selectOptionProperty() {
-        return selectOption;
-    }
-
-    public void setSelectOption (){
-        this.selectOption.set(true);
-    }
-
-    public void setSelectOption(boolean selectOption) {
-        this.selectOption.set(selectOption);
     }
 
     public void saveToFIle(Path file ) {
@@ -181,6 +230,29 @@ public class shapeModel {
         }
         }
 
+    public void checkIfInsideShape(double x, double y) {
+        for (var shape : shapeObservableList) {
+            if (shape.isInsideShape(x,y))
+                System.out.println("inside");
+                selectedShapesContains(shape);
+        }
+    }
+    public void selectedShapesContains(Shape selectedShape) {
+        if (selectedShapes.contains(selectedShape)) {
+            selectedShape.setBorderColor(Color.GREEN);
+            selectedShapes.remove(selectedShapes);
+        } else {
+            selectedShape.setBorderColor(Color.RED);
+            selectedShapes.add(selectedShape);
+        }
+    }
+    public void changeColorOnShape(){
+        addChangesToUndoList();
+
+        for(var shape : selectedShapes){
+            shape.setColor(getColorPickerSelect());
+        }
+    }
 
 
 
