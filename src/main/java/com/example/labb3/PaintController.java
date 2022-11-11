@@ -2,7 +2,6 @@ package com.example.labb3;
 
 import Shapes.*;
 import javafx.application.Platform;
-import javafx.beans.binding.Bindings;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.collections.ListChangeListener;
@@ -12,34 +11,37 @@ import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.*;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.paint.Color;
-import javafx.stage.FileChooser;
 import javafx.stage.Stage;
-import model.Point;
+import model.SaveFile;
 import model.shapeModel;
 
-import java.io.File;
 
+public class PaintController {
 
-public class HelloController {
-    public BooleanProperty selectOption;
     public Canvas canvas;
-    public BooleanProperty circle;
     public GraphicsContext context;
     public TextField brushSize;
     public ColorPicker colorPick;
-    public BooleanProperty rectangle;
     public MenuItem save;
+
+    public BooleanProperty selectOption;
+    public BooleanProperty circle;
+    public BooleanProperty rectangle;
+
     public Button rectangleId;
     public Button circleId;
+    public Button undoButton;
+    public Button pointer;
+
+
     public shapeModel model;
     public Factory factory;
-    public Button pointer;
+
     public CheckBox selector;
-    public Button undoButton;
     private Stage stage;
 
 
-    public HelloController() {
+    public PaintController() {
         this.rectangle = new SimpleBooleanProperty();
         this.circle = new SimpleBooleanProperty();
         this.selectOption = new SimpleBooleanProperty();
@@ -49,9 +51,6 @@ public class HelloController {
 
     }
 
-    public void setStage(Stage stage) {
-        this.stage = stage;
-    }
 
     public void initialize() {
 
@@ -60,8 +59,8 @@ public class HelloController {
         selectOption.bindBidirectional(model.selectOptionProperty());
         brushSize.textProperty().bindBidirectional(model.sizeSelectProperty());
         model.getShapeObservableList().addListener((ListChangeListener<Shape>) e -> drawShapes(context));
-         model.addChangesToUndoList();
-         selector.selectedProperty().bindBidirectional(model.selectOptionProperty());
+        model.addChangesToUndoList();
+        selector.selectedProperty().bindBidirectional(model.selectOptionProperty());
 
     }
 
@@ -73,17 +72,9 @@ public class HelloController {
         if (model.isSelectOption()) {
             model.checkIfInsideShape(x, y);
         } else {
-            selectOrCreateShape(x, y);
+            createAndAddNewShape(x,y);
         }
     }
-   /*     model.setPoint(mouseEvent.getX(), mouseEvent.getY());
-        if(model.isSelectOption()){
-            model.checkIfInsideShape(mouseEvent.getX(), mouseEvent.getY());
-
-        }
-        selectOrCreateShape(mouseEvent.getX(), mouseEvent.getY());
-    }*/
-
     public void clearCanvas (){
         context.clearRect(0,0,canvas.getWidth(), canvas.getHeight());
 
@@ -100,9 +91,6 @@ public class HelloController {
         return Factory.createShape(type, colorPick, x, y, size);
     }
 
-    public void actionExit(ActionEvent event) {
-        Platform.exit();
-    }
 
 
 
@@ -120,21 +108,6 @@ public class HelloController {
 
         }
 
-   /* private void checkIfInsideShape(double x, double y) {
-        for(var shape : model.getShapeObservableList())
-            checkIfSelectedIsInside(x,y, shape);
-
-
-
-    }*/
-
-    private void selectOrCreateShape(double x, double y) {
-        if(selectOption.get())
-            model.checkIfInsideShape(x,y);
-        else
-            createAndAddNewShape(x,y);
-
-        }
 
         private void createAndAddNewShape(double x, double y) {
         var newShape = returnNewShape(model.getShapeType(),colorPick.getValue(),x,y,model.getSizeText());
@@ -145,19 +118,6 @@ public class HelloController {
 
     public void undoAction () {
         model.undoLatestChange();
-
-
-    }
-
-
-    public void onSave(ActionEvent event) {
-        FileChooser fileChooser = new FileChooser();
-        fileChooser.setTitle("Save");
-        fileChooser.setInitialDirectory(new File(System.getProperty("user.home")));
-        fileChooser.getExtensionFilters().clear();
-        fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("CSV", "*csv"));
-
-        File file = fileChooser.showSaveDialog(stage);
 
 
     }
@@ -173,4 +133,17 @@ public class HelloController {
     public void OnChangeColor() {
         model.changeColorOnShape();
     }
+
+    public void onSave() {
+        new SaveFile().save(model,stage);
+    }
+    public void actionExit(ActionEvent event) {
+        Platform.exit();
+    }
+
+    public void setStage(Stage stage) {
+        this.stage = stage;
+    }
+
+
 }

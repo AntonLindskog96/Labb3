@@ -3,7 +3,6 @@ package Shapes;
 
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.paint.Color;
-import model.Point;
 
 public class RectangleShape extends Shape{
 
@@ -13,61 +12,40 @@ public class RectangleShape extends Shape{
     }
 
     public String svgFormat() {
-        return "<rectangle cx=\"" + centerPoint().getPosX() + "\" cy=\"" + centerPoint().getPosY() + "\" r=\"" + (getSize() / 2) +
-                "\" fill=\"#" + getColor().toString().substring(2) + "\" />";
+        String convertedColor = "#" + getColor().toString().substring(2,10);
+
+        return "<rect x=\"" + (getX() - getSize()) + "\" " +
+                "y=\"" + (getY() - getSize()) + "\" " +
+                "width=\"" + (2 * getSize()) + "\" " +
+                "height=\"" + (2 * getSize()) + "\" " +
+                "fill=\"" + convertedColor + "\" />";
     }
 
     @Override
     public void draw (GraphicsContext context){
         context.setFill(getBorderColor());
+        context.fillRect(getX() - getSize() - 2.5, getY() - getSize() - 2.5, 2 * getSize() + 5, 2 * getSize() + 5);
         context.setFill(getColor());
-        context.fillRect(centerPoint().getPosX(), centerPoint().getPosY(), getSize(), getSize() /2 * 1.75);
-        /*double size = getSize();
-        double x = getX() - size / 2* 1.75;
-        double y = getY() - size / 2;
-        context.setFill(getColor());
-        context.fillRect(x,y, size * 1.75, size);*/
+        context.fillRect(getX() - getSize(), getY() - getSize(), 2 * getSize(), 2 * getSize());
     }
-
     @Override
     public Shape copyOf (){
         return new RectangleShape(getColor(), getX(),getY(),getSize(),getShape());
     }
 
     @Override
-    public String toString() {
-        return getColor() + super.getClass().toString();
-    }
-
-    @Override
-    public boolean insideShape(double x, double y){
-        double coordinate = Math.sqrt(coordinateX(x,y) + coordinateY(x,y));
-        return coordinate <= getSize();
-    }
-
-    private double coordinateY(double x, double y) {
-        double coordinateY = getX() - getY();
-        return coordinateY;
-    }
-
-    private double coordinateX(double x, double y) {
-        double coordinateX = getX() - getX();
-        return coordinateX;
-    }
-
-    @Override
     public boolean isInsideShape(double mouseX, double mouseY) {
-        double distX = mouseX - getX();
-        double distY = mouseY - getY();
-        double distance = Math.sqrt((distX * distX) + (distY * distY));
+        double leftX = getX() - getSize();
+        double topY = getY() - getSize();
 
-        return distance <= getSize();
+        return mouseX >= leftX &&
+                mouseX <= leftX + 2 * getSize() &&
+                mouseY >= topY &&
+                mouseY <= topY + 2 * getSize();
     }
 
     @Override
-    public boolean pointInsideShape(Point point) {
-        boolean xInside = point.getPosX() >= centerPoint().getPosX() && point.getPosX() <= centerPoint().getPosX() + getSize();
-        boolean yInside = point.getPosY() >= centerPoint().getPosY() && point.getPosY() <= centerPoint().getPosY() + getSize();
-        return xInside && yInside;
+    public String toString() {
+        return "" + super.getColor();
     }
 }

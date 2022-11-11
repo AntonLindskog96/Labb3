@@ -22,14 +22,15 @@ public abstract class Shape {
 
 
 
-    public Shape(Color color,double x, double y, double size, ShapeType shape) {
+    protected Shape(Color color,double x, double y, double size, ShapeType shape) {
         setY(y);
         setX(x);
         setColor(color);
-        setBorderColor(Color.YELLOW);
+        setBorderColor(Color.TRANSPARENT);
         setSize(size);
         this.shape = shape;
     }
+
 
     public Point centerPoint(){
         var centerX = getX() - getSize() / 2;
@@ -100,17 +101,9 @@ public abstract class Shape {
     public abstract String svgFormat();
 
     public void draw(GraphicsContext context){
-
-
     }
 
     public abstract Shape copyOf();
-
-    public abstract boolean insideShape(double x, double y);
-
-    public abstract boolean isInsideShape(double mouseX, double mouseY);
-
-    public abstract boolean pointInsideShape(Point point);
 
     @Override
     public boolean equals(Object o) {
@@ -124,6 +117,12 @@ public abstract class Shape {
     public int hashCode() {
         return Objects.hash(y, x, size, color, shape);
     }
+
+
+    public abstract boolean isInsideShape(double mouseX, double mouseY);
+
+
+    // public abstract boolean pointInsideShape(Point point);
 }
 
 

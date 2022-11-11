@@ -1,6 +1,7 @@
 module com.example.labb3 {
     requires javafx.controls;
     requires javafx.fxml;
+    requires junit;
 
 
     opens com.example.labb3 to javafx.fxml;

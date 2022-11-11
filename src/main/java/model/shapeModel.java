@@ -27,7 +27,7 @@ public class shapeModel {
     private final ObjectProperty<Color> colorPickerSelect;
     private final ObjectProperty<Color> borderColor;
     private final StringProperty sizeSelect;
-    private final List<Integer> changeList;
+    private final List<Shape> changeList;
 
     private final BooleanProperty selectOption;
     private ShapeType shapeType = ShapeType.CIRCLE;
@@ -59,7 +59,7 @@ public class shapeModel {
     public shapeModel() {
         this.colorPickerSelect = new SimpleObjectProperty<>(Color.BLACK);
         this.borderColor = new SimpleObjectProperty<>();
-        this.borderColor.set(Color.TEAL);
+        this.borderColor.set(Color.TRANSPARENT);
         this.Circle = new SimpleBooleanProperty(false);
         this.selectedShapes = FXCollections.observableArrayList();
         this.changeList = new ArrayList<>();
@@ -105,7 +105,6 @@ public class shapeModel {
 
     }
 
-
     public void addToShapes(Shape shape){
         if(!(shape == null))
             this.shapeObservableList.add(shape);
@@ -116,11 +115,13 @@ public class shapeModel {
     public void setCircle(){
         shapeType = ShapeType.CIRCLE;
         setSelectOption(false);
+        setRectangle(false);
     }
 
     public void setRectangle(){
         shapeType = ShapeType.RECTANGLE;
         setSelectOption(false);
+        setCircle(false);
     }
 
     public boolean isCircle() {
@@ -150,6 +151,7 @@ public class shapeModel {
         }
         selectedShapes.clear();
     }
+
 
     public Color getBorderColor() {
         return borderColor.get();
@@ -233,19 +235,20 @@ public class shapeModel {
     public void checkIfInsideShape(double x, double y) {
         for (var shape : shapeObservableList) {
             if (shape.isInsideShape(x,y))
-                System.out.println("inside");
                 selectedShapesContains(shape);
         }
     }
+
     public void selectedShapesContains(Shape selectedShape) {
         if (selectedShapes.contains(selectedShape)) {
-            selectedShape.setBorderColor(Color.GREEN);
-            selectedShapes.remove(selectedShapes);
+            selectedShape.setBorderColor(Color.TRANSPARENT);
+            selectedShapes.remove(selectedShape);
         } else {
             selectedShape.setBorderColor(Color.RED);
             selectedShapes.add(selectedShape);
         }
     }
+
     public void changeColorOnShape(){
         addChangesToUndoList();
 
@@ -253,6 +256,7 @@ public class shapeModel {
             shape.setColor(getColorPickerSelect());
         }
     }
+
 
 
 
