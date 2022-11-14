@@ -13,7 +13,7 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 import model.SaveFile;
-import model.shapeModel;
+import model.ShapeModel;
 
 
 public class PaintController {
@@ -34,7 +34,7 @@ public class PaintController {
     public Button pointer;
 
 
-    public shapeModel model;
+    public ShapeModel model;
     public Factory factory;
 
     public CheckBox selector;
@@ -46,7 +46,7 @@ public class PaintController {
         this.circle = new SimpleBooleanProperty();
         this.selectOption = new SimpleBooleanProperty();
         this.brushSize = new TextField();
-        this.model = new shapeModel();
+        this.model = new ShapeModel();
         this.factory = new Factory();
 
     }

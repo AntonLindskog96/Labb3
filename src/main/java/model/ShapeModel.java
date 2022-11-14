@@ -1,5 +1,4 @@
 package model;
-import Shapes.Factory;
 import Shapes.Shape;
 import Shapes.ShapeType;
 import javafx.beans.Observable;
@@ -8,13 +7,10 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.scene.paint.Color;
 
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 
-public class shapeModel {
+public class ShapeModel {
     private final BooleanProperty Circle;
     private final BooleanProperty Rectangle;
     private Point point;
@@ -50,13 +46,8 @@ public class shapeModel {
     }
 
 
-    public void createShapeToList(ShapeType type) {
-        Shape shape = Factory.createShape(type,colorPickerSelect.get(),point.getPosX(),point.getPosY(),getSizeText());
-        shapeObservableList.add(shape);
-    }
 
-
-    public shapeModel() {
+    public ShapeModel() {
         this.colorPickerSelect = new SimpleObjectProperty<>(Color.BLACK);
         this.borderColor = new SimpleObjectProperty<>();
         this.borderColor.set(Color.TRANSPARENT);
@@ -216,21 +207,6 @@ public class shapeModel {
         this.colorPickerSelect.set(colorPickerSelect);
     }
 
-    public void saveToFIle(Path file ) {
-        StringBuffer outPut = new StringBuffer();
-        for (Shape s: getShapeObservableList()){
-            outPut.append(s.getX());
-            outPut.append(s.getY());
-            outPut.append(s.getSize());
-            outPut.append(s.getColor());
-
-        }
-        try {
-            Files.writeString(file, outPut.toString());
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-        }
 
     public void checkIfInsideShape(double x, double y) {
         for (var shape : shapeObservableList) {
