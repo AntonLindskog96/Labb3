@@ -1,6 +1,7 @@
 package model;
 import Shapes.Shape;
 import Shapes.ShapeType;
+import com.example.labb3.Point;
 import javafx.beans.Observable;
 import javafx.beans.property.*;
 import javafx.collections.FXCollections;
@@ -115,26 +116,6 @@ public class ShapeModel {
         setCircle(false);
     }
 
-    public boolean isCircle() {
-        return Circle.get();
-    }
-
-    public BooleanProperty circleProperty() {
-        return Circle;
-    }
-
-    public boolean isRectangle() {
-        return Rectangle.get();
-    }
-
-    public BooleanProperty rectangleProperty() {
-        return Rectangle;
-    }
-
-    public ObservableList<Shape> getSelectedShape() {
-        return selectedShapes;
-    }
-
 
     public void clearSelectedShapes(){
         for(var shape : shapeObservableList){
@@ -143,18 +124,6 @@ public class ShapeModel {
         selectedShapes.clear();
     }
 
-
-    public Color getBorderColor() {
-        return borderColor.get();
-    }
-
-    public ObjectProperty<Color> borderColorProperty() {
-        return borderColor;
-    }
-
-    public void setBorderColor(Color borderColor) {
-        this.borderColor.set(borderColor);
-    }
 
     public ObjectProperty<Color> colorSelectProperty() {
         return colorPickerSelect;
@@ -197,14 +166,6 @@ public class ShapeModel {
 
     public Color getColorPickerSelect() {
         return colorPickerSelect.get();
-    }
-
-    public ObjectProperty<Color> colorPickerSelectProperty() {
-        return colorPickerSelect;
-    }
-
-    public void setColorPickerSelect(Color colorPickerSelect) {
-        this.colorPickerSelect.set(colorPickerSelect);
     }
 
 

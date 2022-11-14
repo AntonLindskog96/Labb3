@@ -3,7 +3,7 @@ import javafx.beans.property.SimpleDoubleProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.paint.Color;
-import model.Point;
+import com.example.labb3.Point;
 
 import java.util.Objects;
 

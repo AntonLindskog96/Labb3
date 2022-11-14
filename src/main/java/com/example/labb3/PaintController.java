@@ -12,7 +12,7 @@ import javafx.scene.control.*;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
-import model.SaveFile;
+import FileSaver.SaveFile;
 import model.ShapeModel;
 
 

@@ -1,8 +1,9 @@
-package model;
+package FileSaver;
 
 import Shapes.Shape;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
+import model.ShapeModel;
 
 import java.io.IOException;
 import java.nio.file.Files;

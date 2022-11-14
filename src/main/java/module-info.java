@@ -8,4 +8,6 @@ module com.example.labb3 {
     exports com.example.labb3;
     exports model;
     opens model to javafx.fxml;
+    exports FileSaver;
+    opens FileSaver to javafx.fxml;
 }

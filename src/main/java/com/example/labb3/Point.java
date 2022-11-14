@@ -1,4 +1,4 @@
-package model;
+package com.example.labb3;
 
 public class Point {
     private double posX;
