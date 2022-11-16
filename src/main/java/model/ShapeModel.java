@@ -29,6 +29,8 @@ public class ShapeModel {
     private final BooleanProperty selectOption;
     private ShapeType shapeType = ShapeType.CIRCLE;
 
+
+
     public ShapeType getShapeType() {
         return shapeType;
 
